@@ -1,37 +1,32 @@
-## Welcome to GitHub Pages
+# learnElement
 
-You can use the [editor on GitHub](https://github.com/fxss5201/learnElement/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+learn Element-ui
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## 项目说明
 
-### Markdown
+运行本项目，需要将 VuePress 安装为本地依赖：
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+``` Shell
+# 将本项目克隆到本地
+git clone git@github.com:fxss5201/learnElement.git
 
-```markdown
-Syntax highlighted code block
+# 安装依赖
+npm install
 
-# Header 1
-## Header 2
-### Header 3
+# 开始写作
+npm run docs:dev
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+# 构建
+npm run docs:build
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+其他相关配置请查看 [VuePress官网](https://vuepress.vuejs.org/zh/) 。
 
-### Jekyll Themes
+另外本项目的部署方式采用的是 [GitHub Pages](https://vuepress.vuejs.org/zh/guide/deploy.html#github-pages)，相应的`deploy.sh`文件已经创建好，md文档编写好了之后上传github，再执行
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/fxss5201/learnElement/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
-### Support or Contact
+``` Shell
+npm run deploy
+```
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+会自动构建并将构建好的静态页面自动上传到github上对应的分支。
