@@ -1,0 +1,31 @@
+{
+  "name": "learnelement",
+  "version": "1.0.0",
+  "description": "learn Element-ui",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fxss5201/learnElement.git"
+  },
+  "keywords": [
+    "learnElement"
+  ],
+  "author": "fxss",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fxss5201/learnElement/issues"
+  },
+  "homepage": "https://github.com/fxss5201/learnElement#readme",
+  "devDependencies": {
+    "@vuepress/plugin-active-header-links": "^1.2.0",
+    "@vuepress/plugin-back-to-top": "^1.2.0",
+    "@vuepress/plugin-medium-zoom": "^1.2.0",
+    "@vuepress/plugin-nprogress": "^1.2.0",
+    "@vuepress/plugin-search": "^1.2.0",
+    "vuepress": "^1.2.0"
+  }
+}
