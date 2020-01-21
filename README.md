@@ -9,6 +9,7 @@ learn Element-ui
 ``` Shell
 # 将本项目克隆到本地
 git clone git@github.com:fxss5201/learnElement.git
+# git clone https://github.com/fxss5201/learnElement.git
 
 # 安装依赖
 npm install
