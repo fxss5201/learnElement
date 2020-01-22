@@ -10,7 +10,7 @@ meta:
 
 本文件主要放 Element-ui src/utils 目录的内容。
 
-## `dom.js` 文件
+## `dom.js`
 
 `dom.js`文件内容：
 
@@ -191,5 +191,184 @@ export function removeClass(el, cls) {
   if (!el.classList) {
     el.className = trim(curClass);
   }
+};
+```
+
+### getStyle 获取样式
+
+```js
+export const getStyle = ieVersion < 9 ? function(element, styleName) {
+  if (isServer) return;
+  if (!element || !styleName) return null;
+  styleName = camelCase(styleName);
+  if (styleName === 'float') {
+    styleName = 'styleFloat';
+  }
+  try {
+    switch (styleName) {
+      case 'opacity':
+        try {
+          return element.filters.item('alpha').opacity / 100;
+        } catch (e) {
+          return 1.0;
+        }
+      default:
+        // https://developer.mozilla.org/en-US/docs/Web/API/Element/currentStyle
+        return (element.style[styleName] || element.currentStyle ? element.currentStyle[styleName] : null);
+    }
+  } catch (e) {
+    return element.style[styleName];
+  }
+} : function(element, styleName) {
+  if (isServer) return;
+  if (!element || !styleName) return null;
+  styleName = camelCase(styleName);
+  if (styleName === 'float') {
+    styleName = 'cssFloat';
+  }
+  try {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle
+    var computed = document.defaultView.getComputedStyle(element, '');
+    return element.style[styleName] || computed ? computed[styleName] : null;
+  } catch (e) {
+    return element.style[styleName];
+  }
+};
+```
+
+### setStyle 设置样式
+
+```js
+export function setStyle(element, styleName, value) {
+  if (!element || !styleName) return;
+  // styleName 支持设置为对象格式，一次设置多个样式
+  if (typeof styleName === 'object') {
+    for (var prop in styleName) {
+      if (styleName.hasOwnProperty(prop)) {
+        setStyle(element, prop, styleName[prop]);
+      }
+    }
+  } else {
+    styleName = camelCase(styleName);
+    if (styleName === 'opacity' && ieVersion < 9) {
+      element.style.filter = isNaN(value) ? '' : 'alpha(opacity=' + value * 100 + ')';
+    } else {
+      element.style[styleName] = value;
+    }
+  }
+};
+```
+
+### isScroll
+
+```js
+export const isScroll = (el, vertical) => {
+  if (isServer) return;
+  // vertical：代表方向
+  const determinedDirection = vertical !== null || vertical !== undefined;
+  const overflow = determinedDirection
+    ? vertical
+      ? getStyle(el, 'overflow-y')
+      : getStyle(el, 'overflow-x')
+    : getStyle(el, 'overflow');
+
+  return overflow.match(/(scroll|auto)/);
+};
+```
+
+查看 dom 元素的 `overflow` 样式
+
+### getScrollContainer
+
+```js
+export const getScrollContainer = (el, vertical) => {
+  if (isServer) return;
+
+  let parent = el;
+  while (parent) {
+    if ([window, document, document.documentElement].includes(parent)) {
+      return window;
+    }
+    if (isScroll(parent, vertical)) {
+      return parent;
+    }
+    parent = parent.parentNode;
+  }
+
+  return parent;
+};
+```
+
+由当前元素向上查找到第一个设置 `overflow` 为 `scroll` 或 `auto` 样式的祖先元素。
+
+### isInContainer
+
+```js
+export const isInContainer = (el, container) => {
+  if (isServer || !el || !container) return false;
+
+  const elRect = el.getBoundingClientRect();
+  let containerRect;
+
+  if ([window, document, document.documentElement, null, undefined].includes(container)) {
+    containerRect = {
+      top: 0,
+      right: window.innerWidth,
+      bottom: window.innerHeight,
+      left: 0
+    };
+  } else {
+    containerRect = container.getBoundingClientRect();
+  }
+
+  return elRect.top < containerRect.bottom &&
+    elRect.bottom > containerRect.top &&
+    elRect.right > containerRect.left &&
+    elRect.left < containerRect.right;
+};
+```
+
+查看当前元素（`el`）是否在某个元素（`container`）中。
+
+## `scrollbar-width.js`
+
+获取浏览器滚动条宽度，一般用于弹出层的时候，设置`body`的右边距，防止`overflow: hidden`的时候元素抖动。
+
+```js
+import Vue from 'vue';
+
+let scrollBarWidth;
+
+export default function() {
+  // 如果是服务器端渲染，则浏览器滚动条的宽度为0
+  if (Vue.prototype.$isServer) return 0;
+  if (scrollBarWidth !== undefined) return scrollBarWidth;
+
+  const outer = document.createElement('div');
+  outer.className = 'el-scrollbar__wrap';
+  // 强制出现滚动条
+  // .el-scrollbar__wrap {
+  //   overflow: scroll;
+  //   height: 100%
+  // }
+  outer.style.visibility = 'hidden';
+  outer.style.width = '100px';
+  outer.style.position = 'absolute';
+  outer.style.top = '-9999px';
+  document.body.appendChild(outer);
+  // https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLElement/offsetWidth
+  const widthNoScroll = outer.offsetWidth;
+  outer.style.overflow = 'scroll';
+
+  const inner = document.createElement('div');
+  inner.style.width = '100%';
+  outer.appendChild(inner);
+
+  const widthWithScroll = inner.offsetWidth;
+  outer.parentNode.removeChild(outer);
+  // 父元素出现滚动条，子元素无滚动条，父元素减去子元素的宽度就是滚动条宽度
+  scrollBarWidth = widthNoScroll - widthWithScroll;
+
+  return scrollBarWidth;
 };
 ```
